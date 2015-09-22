@@ -49,21 +49,18 @@ class TasksTableViewController: UITableViewController {
 
     // Method run to render every row.
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let task = self.tasks[indexPath.row]
+        let cell    = tableView.dequeueReusableCellWithIdentifier("TaskCell", forIndexPath: indexPath)
+        let task    = self.tasks[indexPath.row]
         
         if let description = task.taskDescription {
-            let cell = tableView.dequeueReusableCellWithIdentifier("TaskCell", forIndexPath: indexPath)
-            
             cell.textLabel?.text        = task.taskText
             cell.detailTextLabel?.text  = description
-            
-            return cell
         } else {
-            let cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "DefaultCell")
-            
             cell.textLabel?.text        = task.taskText
-            return cell
+            cell.detailTextLabel?.text  = "No Description"
         }
+        
+        return cell
     }
 
     // Override to support conditional editing of the table view.
