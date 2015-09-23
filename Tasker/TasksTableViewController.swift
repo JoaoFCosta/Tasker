@@ -109,19 +109,17 @@ class TasksTableViewController: UITableViewController {
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "ShowDetail" {
-            let destinationViewController   = segue.destinationViewController as! TaskViewController
+            let destinationViewController   = segue.destinationViewController as! TaskTableViewController
             let indexPath                   = self.tableView.indexPathForCell(sender as! UITableViewCell)
             
             // Set up the destination 'TaskViewController' task for editing.
             destinationViewController.task  = self.tasks[indexPath!.row]
         }
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
     }
     
     // This method is run every time the 'Save' button is pressed in 'TaskViewController'.
     @IBAction func unwindToTasksList (sender: UIStoryboardSegue) {
-        if let sender = sender.sourceViewController as? TaskViewController, task = sender.task {
+        if let sender = sender.sourceViewController as? TaskTableViewController, task = sender.task {
             
             if let selectedIndexPath = self.tableView.indexPathForSelectedRow {
                 // Update an existing task.
