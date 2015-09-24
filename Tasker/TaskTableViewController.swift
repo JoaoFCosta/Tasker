@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TaskTableViewController: UITableViewController {
+class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITextViewDelegate {
     
     // MARK: Properties
     @IBOutlet weak var taskText:            UITextField!
@@ -38,6 +38,9 @@ class TaskTableViewController: UITableViewController {
                 self.notificationDate.date      = notification.fireDate!
             }
         }
+        
+        self.taskText.delegate                  = self
+        self.taskDescription.delegate           = self
     }
 
     override func didReceiveMemoryWarning() {
@@ -59,11 +62,11 @@ class TaskTableViewController: UITableViewController {
                 UIApplication.sharedApplication().cancelLocalNotification(notification)
             }
             
-            notification = UILocalNotification()
-            notification!.fireDate = self.notificationDate.date
-            notification!.alertBody = self.task?.valueForKey("taskText") as? String
-            notification!.alertAction = "Ok"
-            notification!.soundName = UILocalNotificationDefaultSoundName
+            notification                = UILocalNotification()
+            notification!.fireDate      = self.notificationDate.date
+            notification!.alertBody     = text
+            notification!.alertAction   = "Ok"
+            notification!.soundName     = UILocalNotificationDefaultSoundName
             UIApplication.sharedApplication().scheduleLocalNotification(notification!)
         }
         else {
@@ -86,5 +89,23 @@ class TaskTableViewController: UITableViewController {
         if isAddingTask { dismissViewControllerAnimated(true, completion: nil) }
         else            { self.navigationController?.popViewControllerAnimated(true) }
 
+    }
+    
+    // MARK: UITextFieldDelegate
+    
+    // Method run when 'return' key is pressed.
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        // Hide the keyboard.
+        self.taskText.resignFirstResponder()
+        return true
+    }
+
+    // MARK: UITextViewDelegate
+    
+    func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+        if text == "\n" {
+            self.taskDescription.resignFirstResponder()
+        }
+        return true
     }
 }
