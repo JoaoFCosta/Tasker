@@ -24,11 +24,6 @@ class TaskTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
         
         // Configure UI Elements if the user is editing an existing task.
         if let task = task {
@@ -43,6 +38,10 @@ class TaskTableViewController: UITableViewController {
                 self.notificationDate.date      = notification.fireDate!
             }
         }
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
     }
 
     // MARK: - Table view data source
