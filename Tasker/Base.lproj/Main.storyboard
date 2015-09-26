@@ -111,6 +111,9 @@
                                                     <date key="date" timeIntervalSinceReferenceDate="464715947.94145399">
                                                         <!--2015-09-23 15:45:47 +0000-->
                                                     </date>
+                                                    <connections>
+                                                        <action selector="dateChanged:" destination="1y5-SH-5U8" eventType="valueChanged" id="QWK-OB-b95"/>
+                                                    </connections>
                                                 </datePicker>
                                             </subviews>
                                             <constraints>

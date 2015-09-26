@@ -8,7 +8,8 @@
 
 import UIKit
 
-class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITextViewDelegate {
+class TaskTableViewController: UITableViewController, UITextFieldDelegate,
+    UITextViewDelegate {
     
     // MARK: Properties
     @IBOutlet weak var taskText:            UITextField!
@@ -57,11 +58,16 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITex
         
         // Setup notification if the user whishes to be notified.
         if self.notificationSwitch.on {
+            
             // Check if there was an already scheduled notification and delete it.
             if let notification = self.task?.notification {
-                UIApplication.sharedApplication().cancelLocalNotification(notification)
+                // Check if current date is different from the older date and delete the old notification.
+                if self.notificationDate.date != self.task?.notification?.fireDate {
+                    UIApplication.sharedApplication().cancelLocalNotification(notification)
+                }
             }
             
+            // Create a new notification.
             notification                = UILocalNotification()
             notification!.fireDate      = self.notificationDate.date
             notification!.alertBody     = text
@@ -107,5 +113,16 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITex
             self.taskDescription.resignFirstResponder()
         }
         return true
+    }
+    
+    // MARK: UIDatePicker
+    
+    /* Verify if the specified date is not a past date */
+    @IBAction func dateChanged(sender: UIDatePicker) {
+        // Verify if a past date was specified and change it to the current hour.
+        if sender.date.timeIntervalSinceNow < 0.0 {
+            sender.date = NSDate(timeIntervalSinceNow: 0.0)
+        }
+        
     }
 }
