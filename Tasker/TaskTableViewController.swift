@@ -67,11 +67,29 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate,
                 }
             }
             
+            // Create the done action.
+            let doneAction                      = UIMutableUserNotificationAction()
+            doneAction.identifier               = "DONE_ACTION"
+            doneAction.title                    = "Done"
+            doneAction.activationMode           = UIUserNotificationActivationMode.Background
+            doneAction.authenticationRequired   = false
+            doneAction.destructive              = false
+            
+            let doneCategory                    = UIMutableUserNotificationCategory()
+            doneCategory.identifier             = "DONE_CATEGORY"
+            doneCategory.setActions([doneAction], forContext: UIUserNotificationActionContext.Default)
+            
+            let categories                      = Set([doneCategory])
+            let settings                        = UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert, categories: categories)
+            
+            UIApplication.sharedApplication().registerUserNotificationSettings(settings)
+            
             // Create a new notification.
-            notification                = UILocalNotification()
-            notification!.fireDate      = self.notificationDate.date
-            notification!.alertBody     = text
-            notification!.alertAction   = "Ok"
+            notification                                = UILocalNotification()
+            notification!.fireDate                      = self.notificationDate.date
+            notification!.alertBody                     = text
+            notification!.applicationIconBadgeNumber    = 1;
+            notification!.alertAction                   = "view"
             notification!.soundName     = UILocalNotificationDefaultSoundName
             UIApplication.sharedApplication().scheduleLocalNotification(notification!)
         }
