@@ -28,6 +28,9 @@ class TasksTableViewController: UITableViewController {
         // Ask user permission to set notifications.
         let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil)
         UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteTask:", name: "deleteTask", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "snoozeTask:", name: "snoozeTask", object: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -135,6 +138,32 @@ class TasksTableViewController: UITableViewController {
     
     func loadSavedTasks () -> [Task]? {
         return NSKeyedUnarchiver.unarchiveObjectWithFile(Task.ArchiveURL.path!) as? [Task]
+    }
+    
+    // MARK: Notifications
+    
+    /**
+        Delete the task associated with the given NSNotification.
+    
+        - parameter notification: Notification that triggers the task remotion.
+    */
+    func deleteTask (notification: NSNotification) {
+        var taskToDelete: Task
+        let taskTitle = notification.object as! String
+        
+        for task in self.tasks {
+            if task.taskText == taskTitle {
+                taskToDelete = task
+                let taskIndex = self.tasks.indexOf(taskToDelete)
+                self.tasks.removeAtIndex(taskIndex!)
+                self.tableView.reloadData()
+                saveTasks()
+            }
+        }
+    }
+    
+    func printAMessage (notification: NSNotification) {
+        print("Hello there!")
     }
 
 }
