@@ -8,7 +8,8 @@
 
 import UIKit
 
-class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITextViewDelegate {
+class TaskTableViewController: UITableViewController, UITextFieldDelegate,
+UITextViewDelegate {
     
     // MARK: Properties
     @IBOutlet weak var taskText:            UITextField!
@@ -21,7 +22,7 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITex
     task is reachable by the 'TasksTablewViewContoller' when updating the list.
     */
     var task:                                   Task?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -41,14 +42,16 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITex
         
         self.taskText.delegate                  = self
         self.taskDescription.delegate           = self
+        
+        self.setupNotificationSettings()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-
+    
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         let text: String                        = self.taskText.text!
@@ -57,16 +60,23 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITex
         
         // Setup notification if the user whishes to be notified.
         if self.notificationSwitch.on {
-            // Check if there was an already scheduled notification and delete it.
-            if let notification = self.task?.notification {
-                UIApplication.sharedApplication().cancelLocalNotification(notification)
+            
+            // Check if there was an already scheduled notification and
+            // Check if current date is different from the older date and delete the old notification.
+            if let notification = self.task?.notification where
+                self.notificationDate.date != self.task?.notification?.fireDate {
+                    UIApplication.sharedApplication().cancelLocalNotification(notification)
             }
             
-            notification                = UILocalNotification()
-            notification!.fireDate      = self.notificationDate.date
-            notification!.alertBody     = text
-            notification!.alertAction   = "Ok"
-            notification!.soundName     = UILocalNotificationDefaultSoundName
+            // Create a new notification.
+            notification            = UILocalNotification()
+            notification!.category  = "TASK_CATEGORY"
+            notification!.alertBody = text
+            notification!.fireDate  = self.notificationDate.date
+            notification!.soundName = UILocalNotificationDefaultSoundName
+            notification!.userInfo  = ["TaskTitle": text]
+            
+            // Schedule the notification.
             UIApplication.sharedApplication().scheduleLocalNotification(notification!)
         }
         else {
@@ -77,6 +87,7 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITex
         }
         
         // Set the task to be passed to the 'TasksTableViewController' after the segue.
+        print(notification?.userInfo as! [String: String])
         self.task       = Task(task: text, description: description, notification: notification)
     }
     
@@ -88,7 +99,7 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITex
         
         if isAddingTask { dismissViewControllerAnimated(true, completion: nil) }
         else            { self.navigationController?.popViewControllerAnimated(true) }
-
+        
     }
     
     // MARK: UITextFieldDelegate
@@ -99,7 +110,7 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITex
         self.taskText.resignFirstResponder()
         return true
     }
-
+    
     // MARK: UITextViewDelegate
     
     func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
@@ -107,5 +118,54 @@ class TaskTableViewController: UITableViewController, UITextFieldDelegate, UITex
             self.taskDescription.resignFirstResponder()
         }
         return true
+    }
+    
+    // MARK: UIDatePicker
+    
+    /* Verify if the specified date is not a past date */
+    @IBAction func dateChanged(sender: UIDatePicker) {
+        // Verify if a past date was specified and change it to the current hour.
+        if sender.date.timeIntervalSinceNow < 0.0 {
+            sender.date = NSDate(timeIntervalSinceNow: 0.0)
+        }
+        
+    }
+    
+    /**
+    Setup notification actions using UIMutableUserNotificationAction and UIMutableUserNotificationCategory.
+    */
+    func setupNotificationSettings () {
+        // Setup Notifications.
+        // Create notification actions.
+        let doneAction                      = UIMutableUserNotificationAction()
+        doneAction.identifier               = "DONE"
+        doneAction.title                    = "Done"
+        doneAction.activationMode           = UIUserNotificationActivationMode.Background
+        doneAction.destructive              = true
+        doneAction.authenticationRequired   = true
+        
+        let snoozeAction                    = UIMutableUserNotificationAction()
+        snoozeAction.identifier             = "SNOOZE"
+        snoozeAction.title                  = "Snooze"
+        snoozeAction.activationMode         = UIUserNotificationActivationMode.Background
+        snoozeAction.destructive            = false
+        snoozeAction.authenticationRequired = false
+        
+        // Create notifications category.
+        let taskCategory            = UIMutableUserNotificationCategory()
+        taskCategory.identifier     = "TASK_CATEGORY"
+        
+        let defaultActions  = [doneAction, snoozeAction]
+        let minimalActions  = [doneAction, snoozeAction]
+        
+        taskCategory.setActions(defaultActions, forContext: .Default)
+        taskCategory.setActions(minimalActions, forContext: .Minimal)
+        
+        // Set of all categories.
+        let categories = Set([taskCategory])
+        
+        // Register notification settings.
+        let notificationSettings: UIUserNotificationSettings = UIUserNotificationSettings(forTypes: [.Alert, .Badge], categories: categories)
+        UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
     }
 }

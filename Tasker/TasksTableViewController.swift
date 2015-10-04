@@ -28,6 +28,9 @@ class TasksTableViewController: UITableViewController {
         // Ask user permission to set notifications.
         let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil)
         UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "deleteTask:", name: "deleteTask", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "snoozeTask:", name: "snoozeTask", object: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -49,18 +52,20 @@ class TasksTableViewController: UITableViewController {
 
     // Method run to render every row.
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell    = tableView.dequeueReusableCellWithIdentifier("TaskCell", forIndexPath: indexPath)
         let task    = self.tasks[indexPath.row]
         
         if let description = task.taskDescription {
-            cell.textLabel?.text        = task.taskText
-            cell.detailTextLabel?.text  = description
+            let cell                        = tableView.dequeueReusableCellWithIdentifier("TaskCell", forIndexPath: indexPath)
+            cell.textLabel?.text            = task.taskText
+            cell.detailTextLabel?.textColor = UIColor.grayColor()
+            cell.detailTextLabel?.text      = description
+            return cell
         } else {
-            cell.textLabel?.text        = task.taskText
-            cell.detailTextLabel?.text  = "No Description"
+            let cell                        = tableView.dequeueReusableCellWithIdentifier("TaskTextCell", forIndexPath: indexPath)
+            cell.textLabel?.text            = task.taskText
+            cell.detailTextLabel?.text      = "No Description"
+            return cell
         }
-        
-        return cell
     }
 
     // Override to support conditional editing of the table view.
@@ -133,6 +138,53 @@ class TasksTableViewController: UITableViewController {
     
     func loadSavedTasks () -> [Task]? {
         return NSKeyedUnarchiver.unarchiveObjectWithFile(Task.ArchiveURL.path!) as? [Task]
+    }
+    
+    // MARK: Notifications
+    
+    /**
+        Delete the task associated with the given NSNotification.
+    
+        - parameter notification: Notification that triggers the task remotion.
+    */
+    func deleteTask (notification: NSNotification) {
+        var taskToDelete: Task
+        let taskTitle = notification.object as! String
+        
+        for task in self.tasks {
+            if task.taskText == taskTitle {
+                taskToDelete = task
+                let taskIndex = self.tasks.indexOf(taskToDelete)
+                self.tasks.removeAtIndex(taskIndex!)
+                self.tableView.reloadData()
+                saveTasks()
+            }
+        }
+    }
+    
+    /**
+        Snooze the task associated with the given NSNotification.
+    
+        - parameter notification: Notification that triggers the snooze.
+    */
+    func snoozeTask (notification: NSNotification) {
+        print("Snoozing!")
+        var taskToSnooze: Task?
+        let taskTitle = notification.object as! String
+        
+        // Search for the task associated with the notification.
+        for task in self.tasks {
+            if task.taskText == taskTitle {
+                taskToSnooze = task
+            }
+        }
+        
+        // Snooze the notification by 10 minutes.
+        if let task = taskToSnooze {
+            let notification        = task.notification!
+            notification.fireDate   = notification.fireDate!.dateByAddingTimeInterval(60 * 10)
+            UIApplication.sharedApplication().scheduleLocalNotification(notification)
+        }
     }
 
 }
