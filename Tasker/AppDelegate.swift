@@ -42,12 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
-        print(notificationSettings.types.rawValue)
-    }
-    
-    func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
-        print("Received Local Notification:\n")
-        print(notification.alertBody)
+        
     }
     
     /* Method run when the user selects to execute an action from a notification. */
@@ -58,6 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         // Snooze action selected, snooze the notification.
         else if identifier == "SNOOZE" {
+            print("Snoozing")
             NSNotificationCenter.defaultCenter().postNotificationName("snoozeTask", object: notification.userInfo!.first!.1 as! String)
         }
         

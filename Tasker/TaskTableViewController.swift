@@ -61,13 +61,11 @@ UITextViewDelegate {
         // Setup notification if the user whishes to be notified.
         if self.notificationSwitch.on {
             
-            // Check if there was an already scheduled notification and delete it.
-            if let notification = self.task?.notification {
-                // Check if current date is different from the older date and delete the old notification.
-                if self.notificationDate.date != self.task?.notification?.fireDate {
-                    notification.userInfo   = ["TaskTitle": text]
+            // Check if there was an already scheduled notification and
+            // Check if current date is different from the older date and delete the old notification.
+            if let notification = self.task?.notification where
+                self.notificationDate.date != self.task?.notification?.fireDate {
                     UIApplication.sharedApplication().cancelLocalNotification(notification)
-                }
             }
             
             // Create a new notification.

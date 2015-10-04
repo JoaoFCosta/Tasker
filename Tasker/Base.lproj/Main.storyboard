@@ -223,7 +223,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
@@ -231,7 +231,7 @@
                                 </tableViewCellContentView>
                                 <animations/>
                                 <connections>
-                                    <segue destination="1y5-SH-5U8" kind="show" identifier="ShowDetail" id="2ab-Tu-THm"/>
+                                    <segue destination="1y5-SH-5U8" kind="show" identifier="ShowDetail" id="aUh-5x-M04"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -292,6 +292,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="2ab-Tu-THm"/>
+        <segue reference="aUh-5x-M04"/>
     </inferredMetricsTieBreakers>
 </document>

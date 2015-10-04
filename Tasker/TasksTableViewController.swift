@@ -162,8 +162,29 @@ class TasksTableViewController: UITableViewController {
         }
     }
     
-    func printAMessage (notification: NSNotification) {
-        print("Hello there!")
+    /**
+        Snooze the task associated with the given NSNotification.
+    
+        - parameter notification: Notification that triggers the snooze.
+    */
+    func snoozeTask (notification: NSNotification) {
+        print("Snoozing!")
+        var taskToSnooze: Task?
+        let taskTitle = notification.object as! String
+        
+        // Search for the task associated with the notification.
+        for task in self.tasks {
+            if task.taskText == taskTitle {
+                taskToSnooze = task
+            }
+        }
+        
+        // Snooze the notification by 10 minutes.
+        if let task = taskToSnooze {
+            let notification        = task.notification!
+            notification.fireDate   = notification.fireDate!.dateByAddingTimeInterval(60 * 10)
+            UIApplication.sharedApplication().scheduleLocalNotification(notification)
+        }
     }
 
 }
