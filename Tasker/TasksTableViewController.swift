@@ -182,7 +182,7 @@ class TasksTableViewController: UITableViewController {
         // Snooze the notification by 10 minutes.
         if let task = taskToSnooze {
             let notification        = task.notification!
-            notification.fireDate   = notification.fireDate!.dateByAddingTimeInterval(60 * 10)
+            notification.fireDate   = NSDate(timeIntervalSinceNow: 0).dateByAddingTimeInterval(60 * 10)
             UIApplication.sharedApplication().scheduleLocalNotification(notification)
         }
     }
